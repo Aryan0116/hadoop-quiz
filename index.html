@@ -1,0 +1,710 @@
+import React, { useState } from 'react';
+import { CheckCircle, XCircle, Award, RotateCcw, ChevronRight, BookOpen, Play } from 'lucide-react';
+
+const quizData = [
+  {
+    id: 1,
+    question: "Dynamic scalability of Hadoop means:",
+    options: [
+      "Nodes can be added as well as removed from the cluster without bringing down the cluster.",
+      "Nodes can be removed from the cluster without bringing down the cluster.",
+      "Nodes can be added to the cluster without bringing down the cluster.",
+      "None of these."
+    ],
+    correct_answer: "Nodes can be added as well as removed from the cluster without bringing down the cluster."
+  },
+  {
+    id: 2,
+    question: "Which of the following Hadoop modules is the framework for scheduling and execution of data processing jobs?",
+    options: [
+      "Hadoop Common",
+      "Hadoop MapReduce",
+      "Hadoop Distributed File System",
+      "Hadoop YARN"
+    ],
+    correct_answer: "Hadoop YARN"
+  },
+  {
+    id: 3,
+    question: "What is the correct sequence of phases in a MapReduce job?",
+    options: [
+      "Input Split-Record Reads Map phase Shuffle and Sort Reduce Phase",
+      "Input Split-Record Reads Map phase Reduce Phase Shuffle and Sort",
+      "Input Split-Record Reads Shuffle and Sort Map phase Reduce Phase",
+      "Map phase Input Split-Record Reads Shuffle and Sort Reduce Phase"
+    ],
+    correct_answer: "Input Split-Record Reads Map phase Shuffle and Sort Reduce Phase"
+  },
+  {
+    id: 4,
+    question: "How do you create a subdirectory sales in HDFS in your default or home location and store the file salestxn.txt from your local filesystem into this subdirectory?",
+    options: [
+      "hadoop fs -mkdir sales hadoop fs -get salestxn.txt sales",
+      "hadoop fs -mkdir sales hadoop fs -put salestxn.txt sales",
+      "hadoop fs -mkdir sales hadoop fs -store salestxn.txt sales",
+      "hadoop fs -createdir sales hadoop fs -put salestxn.txt sales"
+    ],
+    correct_answer: "hadoop fs -mkdir sales hadoop fs -put salestxn.txt sales"
+  },
+  {
+    id: 5,
+    question: "Which statement best describes Apache Hadoop?",
+    options: [
+      "Hadoop is a scalable NoSQL database",
+      "Hadoop is a scalable relational database",
+      "Hadoop is a scalable data storage and batch processing framework",
+      "Hadoop is Data Warehouse"
+    ],
+    correct_answer: "Hadoop is a scalable data storage and batch processing framework"
+  },
+  {
+    id: 6,
+    question: "What happens when Hive Managed table is dropped?",
+    options: [
+      "Drops both, data and metadata",
+      "An error is thrown",
+      "Retains metadata, but deletes data",
+      "Retains data, but deletes metadata"
+    ],
+    correct_answer: "Drops both, data and metadata"
+  },
+  {
+    id: 7,
+    question: "Supposing your login name is hduser then what would be your HDFS home location or HDFS home directory?",
+    options: [
+      "/user/hduser",
+      "/home/hduser",
+      "/hduser",
+      "/hdfs/hduser"
+    ],
+    correct_answer: "/user/hduser"
+  },
+  {
+    id: 8,
+    question: "If the output directory specified in a MapReduce job already exists, MapReduce execution:",
+    options: [
+      "Throws an error and aborts",
+      "Pauses prompting for new output location",
+      "Overwrites the output directory with new output",
+      "Throws a warning and Continues execution"
+    ],
+    correct_answer: "Throws an error and aborts"
+  },
+  {
+    id: 9,
+    question: "What are the master and slave daemons of YARN?",
+    options: [
+      "NameNode and SecondaryNameNode",
+      "NameNode and DataNode",
+      "ResourceManager and NodeManager",
+      "JobTracker and TaskTracker"
+    ],
+    correct_answer: "ResourceManager and NodeManager"
+  },
+  {
+    id: 10,
+    question: "When you store a file in Hadoop Distributed File System (HDFS), where is the data of the file stored?",
+    options: [
+      "All of the above",
+      "SecondaryNameNodes",
+      "NameNodes",
+      "DataNodes"
+    ],
+    correct_answer: "DataNodes"
+  },
+  {
+    id: 11,
+    question: "Which of the following Hadoop modules is the storage component of big data?",
+    options: [
+      "Hadoop Common",
+      "Hadoop Distributed File System",
+      "Hadoop YARN",
+      "Hadoop MapReduce"
+    ],
+    correct_answer: "Hadoop Distributed File System"
+  },
+  {
+    id: 12,
+    question: "The statement - Default replication factor in HDFS is 3 - means that:",
+    options: [
+      "When a file is copied to HDFS 3 copies of it will be stored on any one data node of the cluster.",
+      "When a file is copied to HDFS 3 copies of it will be stored on the name node of the cluster.",
+      "A file is divided into 3 blocks and these are saved on 3 different nodes of the cluster.",
+      "When a file is copied to HDFS 3 copies of it will be stored on 3 different data nodes of the cluster."
+    ],
+    correct_answer: "When a file is copied to HDFS 3 copies of it will be stored on 3 different data nodes of the cluster."
+  },
+  {
+    id: 13,
+    question: "Hive stores the schema of a table in:",
+    options: [
+      "Metastore",
+      "DataNodes",
+      "NameNode",
+      "Secondary NameNode"
+    ],
+    correct_answer: "Metastore"
+  },
+  {
+    id: 14,
+    question: "What is the output of the command: hadoop fs -ls -R",
+    options: [
+      "Gives the listing of the directory named -R",
+      "Gives the listing of the user's default home directory including subdirectories recursively",
+      "Gives the listing of the root directory of hdfs",
+      "Gives an error"
+    ],
+    correct_answer: "Gives the listing of the user's default home directory including subdirectories recursively"
+  },
+  {
+    id: 15,
+    question: "What does the following command do: hadoop fs -df",
+    options: [
+      "Displays the amount of space used by the files in the specified directory",
+      "Displays size of files of user's default home directory",
+      "Displays free space; includes the capacity, free and used space of the filesystem.",
+      "Displays size of files HDFS root directory"
+    ],
+    correct_answer: "Displays free space; includes the capacity, free and used space of the filesystem."
+  },
+  {
+    id: 16,
+    question: "Which of the following statements is or are true regarding MapReduce?\n1. It is too low level and less flexible to program.\n2. Requires extensive coding and testing.",
+    options: [
+      "Only statement 1 is true",
+      "Only statement 2 is true",
+      "None of the statements are true",
+      "Both statements are true"
+    ],
+    correct_answer: "Both statements are true"
+  },
+  {
+    id: 17,
+    question: "Which of these commands can be used to store a file into HDFS from local file system?",
+    options: [
+      "hadoop fs -transfer",
+      "hadoop fs -copy",
+      "hadoop fs -put",
+      "hadoop fs -store"
+    ],
+    correct_answer: "hadoop fs -put"
+  },
+  {
+    id: 18,
+    question: "Which is the following is not a strict hardware requirement for Master nodes in a Hadoop cluster?",
+    options: [
+      "High availability",
+      "High processing capability",
+      "High disk storage capability",
+      "High Reliability"
+    ],
+    correct_answer: "High disk storage capability",
+    explanation: "Master nodes (like the NameNode) primarily store small metadata, not the large data files, so they don't need large disks."
+  },
+  {
+    id: 19,
+    question: "Which of the following statements is true about Racks?",
+    options: [
+      "Machines within a rack communicate through a switch",
+      "Machines within the same rack communicate faster than the machines between different racks",
+      "Racks are steel frames in which the nodes of a Hadoop cluster are mounted",
+      "All of these"
+    ],
+    correct_answer: "All of these",
+    explanation: "All three options accurately describe the function and structure of racks and network communication in a data center."
+  },
+  {
+    id: 20,
+    question: "Which of the following statements is true about HDFS?",
+    options: [
+      "HDFS provides reliability through data replication",
+      "HDFS require enterprise class hardware",
+      "None of the above",
+      "RAID is very suitable for HDFS"
+    ],
+    correct_answer: "HDFS provides reliability through data replication",
+    explanation: "HDFS achieves fault tolerance by storing multiple copies (blocks) of data across the cluster. It uses inexpensive commodity hardware, not enterprise-class hardware."
+  },
+  {
+    id: 21,
+    question: "What is a commodity hardware?",
+    options: [
+      "All the these",
+      "Hardware that is affordable and easy to obtain",
+      "Hardware that is widely available and does not require any special devices or equipment",
+      "Hardware that is generally compatible with other such devices"
+    ],
+    correct_answer: "All the these",
+    explanation: "Commodity hardware is characterized by being affordable, widely available, and compatible (off-the-shelf)."
+  },
+  {
+    id: 22,
+    question: "What are you trying to compute in the below code:\n\nnumList = [10, 100, 300, 40, 50, 60, 60, 60, 65, 65, 75, 55, 54, 67]\nnumerator = 0\ni = 0\nwhile i < 15:\n    numerator = numerator + (numList[i] - Mean)**2\n    i = i + 1\nnum = numerator / 15\nprint(num)",
+    options: [
+      "variance of 15 numbers",
+      "mean of 15 numbers"
+    ],
+    correct_answer: "variance of 15 numbers",
+    explanation: "The code calculates the sum of the squared differences between each element and the Mean, and divides the result by 15. This is the formula for the Population Variance."
+  },
+  {
+    id: 23,
+    question: "Which of the following statements is true? (Hadoop Modes)",
+    options: [
+      "All 3 modes are used for solution deployment",
+      "Standalone mode and Pseudo distributed mode are used only for development and testing, which Fully distributed mode is used for solution deployment",
+      "Standalone mode is used only for development and testing while Pseudo distributed and Fully distributed modes are used for solution deployment",
+      "All 3 modes are used only for development and testing"
+    ],
+    correct_answer: "Standalone mode and Pseudo distributed mode are used only for development and testing, which Fully distributed mode is used for solution deployment",
+    explanation: "Only the Fully Distributed mode is used for production deployment; the other two are for development environments."
+  },
+  {
+    id: 24,
+    question: "What is the output of the above code if upper function is used to convert every string to upper case:\n\nwordList = ['INDIA', 'AUSTRALIA', 'USA', 'FRANCE']\nfirst3Letters = [word[:3].upper() for word in wordList]\nprint(first3Letters)",
+    options: [
+      "['USA','FRA']",
+      "Error",
+      "['IND', 'AUS']",
+      "['IND', 'AUS', 'USA', 'FRA']"
+    ],
+    correct_answer: "['IND', 'AUS', 'USA', 'FRA']",
+    explanation: "word[:3].upper() takes the first three characters of each word and makes them uppercase."
+  },
+  {
+    id: 25,
+    question: "How many times the loop will be executed:\n\nn = 10\nwhile True:\n    print(n)\n    n = n-2\n    if n == 0:\n        break\nprint('Done!')",
+    options: [
+      "Infinite",
+      "10",
+      "5"
+    ],
+    correct_answer: "5",
+    explanation: "The loop runs as n goes from 10 down to 2 in steps of 2: 10 → 8 → 6 → 4 → 2. On the 5th iteration, n becomes 0 and the loop breaks."
+  },
+  {
+    id: 26,
+    question: "Which of the following is a function of secondary Namenode?",
+    options: [
+      "To store duplicate copies of data files from datanodes",
+      "To sever as a backup of the namenode data incase of Namenode failure",
+      "None of the above",
+      "To manage processes running on the Hadoop cluster"
+    ],
+    correct_answer: "To sever as a backup of the namenode data incase of Namenode failure",
+    explanation: "The Secondary NameNode's primary role is checkpointing—merging NameNode metadata logs to create a backup image for recovery."
+  },
+  {
+    id: 27,
+    question: "Which of the following statements is true? (MapReduce Daemons)",
+    options: [
+      "Tasktracker runs on every slave node and manages the process scheduled on that datanode",
+      "None of the above",
+      "Tasktracker runs on Master node and manages the process scheduled on Namenode",
+      "Jobtracker runs on every slave node and manages the processes scheduled on that datanode"
+    ],
+    correct_answer: "Tasktracker runs on every slave node and manages the process scheduled on that datanode",
+    explanation: "In the legacy MapReduce v1 architecture, the TaskTracker was the slave component that managed task execution on the DataNodes."
+  },
+  {
+    id: 28,
+    question: "Which of the following is a function of the Namenode?",
+    options: [
+      "To store the backup of the data files",
+      "To store metadata about the data files stored in HDFS",
+      "To store the backup of the metadata of HDFS",
+      "To store the data files in HDFS"
+    ],
+    correct_answer: "To store metadata about the data files stored in HDFS",
+    explanation: "The NameNode is the master service responsible for maintaining the filesystem metadata (the file hierarchy and block map)."
+  },
+  {
+    id: 29,
+    question: "Which of the following statement is true? (Hadoop Modes)",
+    options: [
+      "Standalone mode runs on a single server, while pseudo distributed and fully distributed run on cluster of machines",
+      "Standalone mode and pseudo distributed mode run on single server while fully distributed mode runs on cluster of machines",
+      "Standalone mode, Pseudo distributed mode and fully distributed mode All run on cluster of machines",
+      "Standalone mode, Pseudo distributed mode and fully distributed mode All run on Single server"
+    ],
+    correct_answer: "Standalone mode and pseudo distributed mode run on single server while fully distributed mode runs on cluster of machines",
+    explanation: "Standalone and Pseudo-Distributed run processes on a single machine, while Fully Distributed mode runs on a cluster of machines."
+  },
+  {
+    id: 30,
+    question: "Assume we have a list a, what is the result of the below operation: print(a*3)",
+    options: [
+      "Multiply the elements of the list by 3",
+      "Repeat the elements of list a 3 times",
+      "Error",
+      "Filter the elements of the list divisible by 3"
+    ],
+    correct_answer: "Repeat the elements of list a 3 times",
+    explanation: "In Python, multiplying a list by an integer uses the repetition operator, creating a new list that is the original list concatenated three times."
+  },
+  {
+    id: 31,
+    question: "What does the below comprehensive list do: print([elem/2 for elem in num if len(str(elem)) == 3])",
+    options: [
+      "Divide all numbers by 2",
+      "find out all 3 digit numbers and numbers which are divisible by 2",
+      "Error",
+      "For all 3 digit number divide the numebr by 2"
+    ],
+    correct_answer: "For all 3 digit number divide the numebr by 2",
+    explanation: "The 'if' clause filters for 3-digit numbers (len(str(elem)) == 3), and the elem/2 expression divides those filtered numbers by 2."
+  },
+  {
+    id: 32,
+    question: "What is the output of this program? str=\"Hello\" print(str[2:])",
+    options: [
+      "Lo",
+      "Hello",
+      "Hel",
+      "llo"
+    ],
+    correct_answer: "llo",
+    explanation: "Slicing str[2:] starts at index 2 ('l') and includes all characters through the end, resulting in 'llo'."
+  },
+  {
+    id: 33,
+    question: "What is a job in Hadoop ecosystem?",
+    options: [
+      "A process which is always running in the background",
+      "An executable submitted by the user to run on a Hadoop cluster",
+      "All of these",
+      "A Java program written for Hadoop"
+    ],
+    correct_answer: "An executable submitted by the user to run on a Hadoop cluster",
+    explanation: "A Hadoop job (or application) is the complete execution unit submitted by a user for processing on the cluster."
+  },
+  {
+    id: 34,
+    question: "Which of the following rightly defines a distributed system?",
+    options: [
+      "Cluster of machines interconnected by a network",
+      "None of these",
+      "Single server system that has duplicate copies in multiple locations",
+      "Collection of machines that are not interconnected but can work independently"
+    ],
+    correct_answer: "Cluster of machines interconnected by a network",
+    explanation: "A distributed system is defined as a collection of autonomous machines working together, necessitating a network connection for communication and coordination."
+  },
+  {
+    id: 35,
+    question: "What's wrong with this loop?\n\ni = 0\nwhile (i < 10):\n    i = i - 1",
+    options: [
+      "It's an infinite loop",
+      "Variable i should be used only for for loops",
+      "Nothing wrong",
+      "It should be i = i - 1 rather than i = i - 1"
+    ],
+    correct_answer: "It's an infinite loop",
+    explanation: "The condition is i < 10. Since i starts at 0 and is continually decremented (i = -1, -2, -3, ...), the condition will always remain true, causing the loop to run infinitely."
+  },
+  {
+    id: 36,
+    question: "What does the below comprehensive list do: print([elem/2 if elem%2==0 else elem/3 for elem in num])",
+    options: [
+      "Form a a list of all elements such that dividing even numbers by 2 and odd numbers by 3",
+      "Form a a list of all elements such that dividing all numbers by 2",
+      "Form a a list of all elements such that dividing even numbers by 3 and odd numbers by 2",
+      "Form a a list of all elements such that dividing all numbers by 3"
+    ],
+    correct_answer: "Form a a list of all elements such that dividing even numbers by 2 and odd numbers by 3",
+    explanation: "This uses a conditional expression: If elem%2==0 (even), it calculates elem/2. If it's false (odd), it calculates elem/3."
+  }
+];
+
+export default function HadoopQuiz() {
+  const [gameState, setGameState] = useState('start'); // start, quiz, results
+  const [currentQuestion, setCurrentQuestion] = useState(0);
+  const [selectedAnswer, setSelectedAnswer] = useState(null);
+  const [score, setScore] = useState(0);
+  const [answered, setAnswered] = useState(false);
+  const [userAnswers, setUserAnswers] = useState([]);
+
+  const handleStartQuiz = () => {
+    setGameState('quiz');
+    setCurrentQuestion(0);
+    setScore(0);
+    setUserAnswers([]);
+    setSelectedAnswer(null);
+    setAnswered(false);
+  };
+
+  const handleAnswerClick = (option) => {
+    if (answered) return;
+    
+    setSelectedAnswer(option);
+    setAnswered(true);
+    
+    const isCorrect = option === quizData[currentQuestion].correct_answer;
+    if (isCorrect) {
+      setScore(score + 1);
+    }
+    
+    setUserAnswers([...userAnswers, {
+      question: quizData[currentQuestion].question,
+      selectedAnswer: option,
+      correctAnswer: quizData[currentQuestion].correct_answer,
+      isCorrect: isCorrect,
+      explanation: quizData[currentQuestion].explanation
+    }]);
+  };
+
+  const handleNext = () => {
+    if (currentQuestion < quizData.length - 1) {
+      setCurrentQuestion(currentQuestion + 1);
+      setSelectedAnswer(null);
+      setAnswered(false);
+    } else {
+      setGameState('results');
+    }
+  };
+
+  const handleRestart = () => {
+    setGameState('start');
+    setCurrentQuestion(0);
+    setSelectedAnswer(null);
+    setScore(0);
+    setAnswered(false);
+    setUserAnswers([]);
+  };
+
+  const getOptionClass = (option) => {
+    if (!answered) {
+      return 'bg-white hover:bg-gradient-to-r hover:from-blue-50 hover:to-purple-50 border-2 border-gray-200 hover:border-blue-400 hover:shadow-md';
+    }
+    
+    if (option === quizData[currentQuestion].correct_answer) {
+      return 'bg-gradient-to-r from-green-50 to-emerald-50 border-2 border-green-500 shadow-lg';
+    }
+    
+    if (option === selectedAnswer && option !== quizData[currentQuestion].correct_answer) {
+      return 'bg-gradient-to-r from-red-50 to-rose-50 border-2 border-red-500 shadow-lg';
+    }
+    
+    return 'bg-gray-50 border-2 border-gray-200 opacity-60';
+  };
+
+  const getIconForOption = (option) => {
+    if (!answered) return null;
+    
+    if (option === quizData[currentQuestion].correct_answer) {
+      return <CheckCircle className="w-6 h-6 text-green-600" />;
+    }
+    
+    if (option === selectedAnswer && option !== quizData[currentQuestion].correct_answer) {
+      return <XCircle className="w-6 h-6 text-red-600" />;
+    }
+    
+    return null;
+  };
+
+  // Start Screen
+  if (gameState === 'start') {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500 flex items-center justify-center p-4">
+        <div className="bg-white rounded-3xl shadow-2xl p-8 md:p-12 max-w-2xl w-full text-center">
+          <div className="inline-block p-6 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full mb-6 shadow-lg">
+            <BookOpen className="w-20 h-20 text-white" />
+          </div>
+          
+          <h1 className="text-5xl font-bold text-gray-800 mb-4">Hadoop & Python Quiz</h1>
+          <p className="text-xl text-gray-600 mb-8">Test your knowledge with {quizData.length} questions</p>
+          
+          <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-2xl p-6 mb-8 border-2 border-purple-200">
+            <h3 className="text-lg font-semibold text-gray-800 mb-3">Quiz Features:</h3>
+            <ul className="text-left text-gray-700 space-y-2">
+              <li className="flex items-center gap-2">
+                <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                {quizData.length} Multiple Choice Questions
+              </li>
+              <li className="flex items-center gap-2">
+                <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
+                Instant feedback on your answers
+              </li>
+              <li className="flex items-center gap-2">
+                <div className="w-2 h-2 bg-pink-500 rounded-full"></div>
+                Detailed explanations for each question
+              </li>
+              <li className="flex items-center gap-2">
+                <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                Track your score in real-time
+              </li>
+            </ul>
+          </div>
+          
+          <button
+            onClick={handleStartQuiz}
+            className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-12 py-5 rounded-xl font-semibold text-xl hover:shadow-xl transform hover:scale-105 transition-all duration-200 flex items-center gap-3 mx-auto"
+          >
+            <Play className="w-6 h-6" />
+            Start Quiz
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // Results Screen
+  if (gameState === 'results') {
+    const percentage = ((score / quizData.length) * 100).toFixed(0);
+    
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500 p-4 py-8">
+        <div className="bg-white rounded-3xl shadow-2xl p-6 md:p-10 max-w-5xl mx-auto">
+          <div className="text-center mb-8">
+            <div className="inline-block p-6 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-full mb-6 shadow-lg">
+              <Award className="w-20 h-20 text-white" />
+            </div>
+            
+            <h2 className="text-4xl font-bold text-gray-800 mb-4">Quiz Complete!</h2>
+            
+            <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-2xl p-8 mb-6 border-2 border-purple-200">
+              <p className="text-6xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600 mb-2">
+                {score}/{quizData.length}
+              </p>
+              <p className="text-2xl text-gray-600">Score: {percentage}%</p>
+            </div>
+            
+            <div className="mb-6">
+              {percentage >= 80 ? (
+                <p className="text-xl text-green-600 font-semibold">Excellent work! You really know your Hadoop & Python! 🎉</p>
+              ) : percentage >= 60 ? (
+                <p className="text-xl text-blue-600 font-semibold">Good job! Keep learning! 👍</p>
+              ) : (
+                <p className="text-xl text-orange-600 font-semibold">Keep practicing! You'll get better! 💪</p>
+              )}
+            </div>
+          </div>
+
+          {/* Detailed Results */}
+          <div className="mb-8">
+            <h3 className="text-2xl font-bold text-gray-800 mb-4 flex items-center gap-2">
+              <BookOpen className="w-7 h-7" />
+              Answer Review
+            </h3>
+            
+            <div className="space-y-4 max-h-96 overflow-y-auto pr-2">
+              {userAnswers.map((answer, index) => (
+                <div 
+                  key={index}
+                  className={`p-5 rounded-xl border-2 ${
+                    answer.isCorrect 
+                      ? 'bg-green-50 border-green-300' 
+                      : 'bg-red-50 border-red-300'
+                  }`}
+                >
+                  <div className="flex items-start gap-3 mb-3">
+                    {answer.isCorrect ? (
+                      <CheckCircle className="w-6 h-6 text-green-600 flex-shrink-0 mt-1" />
+                    ) : (
+                      <XCircle className="w-6 h-6 text-red-600 flex-shrink-0 mt-1" />
+                    )}
+                    <div className="flex-1">
+                      <p className="font-semibold text-gray-800 mb-2">
+                        Q{index + 1}: {answer.question}
+                      </p>
+                      
+                      {!answer.isCorrect && (
+                        <div className="mb-2">
+                          <p className="text-sm text-red-700">
+                            <span className="font-semibold">Your answer:</span> {answer.selectedAnswer}
+                          </p>
+                        </div>
+                      )}
+                      
+                      <p className="text-sm text-green-700 mb-2">
+                        <span className="font-semibold">Correct answer:</span> {answer.correctAnswer}
+                      </p>
+                      
+                      {answer.explanation && (
+                        <p className="text-sm text-gray-600 italic mt-2 pl-4 border-l-2 border-gray-300">
+                          {answer.explanation}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="text-center">
+            <button
+              onClick={handleRestart}
+              className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-8 py-4 rounded-xl font-semibold text-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 flex items-center gap-2 mx-auto"
+            >
+              <RotateCcw className="w-5 h-5" />
+              Take Quiz Again
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Quiz Screen
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500 flex items-center justify-center p-4">
+      <div className="bg-white rounded-3xl shadow-2xl p-6 md:p-10 max-w-4xl w-full">
+        {/* Header */}
+        <div className="mb-8">
+          <div className="flex justify-between items-center mb-6">
+            <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-2 rounded-full text-sm font-semibold shadow-lg">
+              Question {currentQuestion + 1}/{quizData.length}
+            </div>
+            <div className="bg-gradient-to-r from-green-500 to-emerald-500 text-white px-6 py-2 rounded-full text-sm font-semibold shadow-lg">
+              Score: {score}
+            </div>
+          </div>
+          
+          {/* Progress Bar */}
+          <div className="w-full bg-gray-200 rounded-full h-3 overflow-hidden shadow-inner">
+            <div 
+              className="bg-gradient-to-r from-blue-600 to-purple-600 h-full rounded-full transition-all duration-500 ease-out shadow-lg"
+              style={{ width: `${((currentQuestion + 1) / quizData.length) * 100}%` }}
+            />
+          </div>
+        </div>
+
+        {/* Question */}
+        <div className="mb-8">
+          <h2 className="text-2xl md:text-3xl font-bold text-gray-800 mb-8 leading-relaxed whitespace-pre-line">
+            {quizData[currentQuestion].question}
+          </h2>
+
+          {/* Options */}
+          <div className="space-y-4">
+            {quizData[currentQuestion].options.map((option, index) => (
+              <button
+                key={index}
+                onClick={() => handleAnswerClick(option)}
+                disabled={answered}
+                className={`w-full text-left p-5 rounded-xl transition-all duration-300 transform hover:scale-[1.02] ${getOptionClass(option)} flex items-center justify-between gap-4`}
+              >
+                <span className="text-gray-800 text-lg font-medium flex-1">{option}</span>
+                {getIconForOption(option)}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Next Button */}
+        {answered && (
+          <div className="flex justify-end animate-in">
+            <button
+              onClick={handleNext}
+              className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-8 py-4 rounded-xl font-semibold text-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 flex items-center gap-2"
+            >
+              {currentQuestion < quizData.length - 1 ? 'Next Question' : 'View Results'}
+              <ChevronRight className="w-5 h-5" />
+            </button>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
