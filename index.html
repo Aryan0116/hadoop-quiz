@@ -1,7 +1,401 @@
-import React, { useState } from 'react';
-import { CheckCircle, XCircle, Award, RotateCcw, ChevronRight, BookOpen, Play } from 'lucide-react';
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hadoop & Python Quiz</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-const quizData = [
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #3b82f6 0%, #9333ea 50%, #ec4899 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 24px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            padding: 40px;
+            max-width: 900px;
+            width: 100%;
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .icon-container {
+            display: inline-flex;
+            padding: 24px;
+            background: linear-gradient(135deg, #3b82f6, #9333ea);
+            border-radius: 50%;
+            margin-bottom: 24px;
+            box-shadow: 0 10px 25px rgba(59, 130, 246, 0.3);
+        }
+
+        .icon {
+            width: 80px;
+            height: 80px;
+            fill: white;
+        }
+
+        h1 {
+            font-size: 3rem;
+            font-weight: bold;
+            color: #1f2937;
+            margin-bottom: 16px;
+        }
+
+        .subtitle {
+            font-size: 1.25rem;
+            color: #6b7280;
+            margin-bottom: 32px;
+        }
+
+        .features-box {
+            background: linear-gradient(135deg, #dbeafe 0%, #f3e8ff 100%);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 32px;
+            border: 2px solid #c4b5fd;
+        }
+
+        .features-box h3 {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 16px;
+        }
+
+        .features-list {
+            list-style: none;
+            color: #374151;
+        }
+
+        .features-list li {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+
+        .bullet {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        .bullet-1 { background: #3b82f6; }
+        .bullet-2 { background: #9333ea; }
+        .bullet-3 { background: #ec4899; }
+        .bullet-4 { background: #3b82f6; }
+
+        .btn {
+            background: linear-gradient(135deg, #2563eb, #9333ea);
+            color: white;
+            padding: 20px 48px;
+            border-radius: 12px;
+            font-size: 1.25rem;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            transition: all 0.2s;
+            box-shadow: 0 10px 25px rgba(37, 99, 235, 0.3);
+        }
+
+        .btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 20px 40px rgba(37, 99, 235, 0.4);
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .badge {
+            padding: 8px 24px;
+            border-radius: 999px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: white;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .badge-question {
+            background: linear-gradient(135deg, #2563eb, #9333ea);
+        }
+
+        .badge-score {
+            background: linear-gradient(135deg, #10b981, #059669);
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 12px;
+            background: #e5e7eb;
+            border-radius: 999px;
+            overflow: hidden;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(135deg, #2563eb, #9333ea);
+            border-radius: 999px;
+            transition: width 0.5s ease-out;
+            box-shadow: 0 2px 4px rgba(37, 99, 235, 0.5);
+        }
+
+        .question {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #1f2937;
+            margin-bottom: 32px;
+            line-height: 1.6;
+            white-space: pre-line;
+        }
+
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            margin-bottom: 32px;
+        }
+
+        .option {
+            width: 100%;
+            text-align: left;
+            padding: 20px;
+            border-radius: 12px;
+            font-size: 1.125rem;
+            font-weight: 500;
+            color: #1f2937;
+            border: 2px solid #e5e7eb;
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .option:not(.disabled):hover {
+            background: linear-gradient(135deg, #dbeafe 0%, #f3e8ff 100%);
+            border-color: #60a5fa;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transform: scale(1.02);
+        }
+
+        .option.correct {
+            background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+            border-color: #10b981;
+            box-shadow: 0 10px 25px rgba(16, 185, 129, 0.2);
+        }
+
+        .option.incorrect {
+            background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+            border-color: #ef4444;
+            box-shadow: 0 10px 25px rgba(239, 68, 68, 0.2);
+        }
+
+        .option.disabled {
+            background: #f9fafb;
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .option-icon {
+            width: 24px;
+            height: 24px;
+            flex-shrink: 0;
+        }
+
+        .next-btn-container {
+            display: flex;
+            justify-content: flex-end;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .results-container {
+            text-align: center;
+        }
+
+        .score-display {
+            background: linear-gradient(135deg, #dbeafe 0%, #f3e8ff 100%);
+            border-radius: 16px;
+            padding: 32px;
+            margin-bottom: 24px;
+            border: 2px solid #c4b5fd;
+        }
+
+        .score-number {
+            font-size: 4rem;
+            font-weight: bold;
+            background: linear-gradient(135deg, #2563eb, #9333ea);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 8px;
+        }
+
+        .score-percentage {
+            font-size: 1.5rem;
+            color: #6b7280;
+        }
+
+        .feedback {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 24px;
+        }
+
+        .feedback.excellent { color: #10b981; }
+        .feedback.good { color: #3b82f6; }
+        .feedback.practice { color: #f59e0b; }
+
+        .review-section {
+            margin-bottom: 32px;
+            text-align: left;
+        }
+
+        .review-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #1f2937;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .review-list {
+            max-height: 400px;
+            overflow-y: auto;
+            padding-right: 8px;
+        }
+
+        .review-item {
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 16px;
+            border: 2px solid;
+        }
+
+        .review-item.correct {
+            background: #d1fae5;
+            border-color: #86efac;
+        }
+
+        .review-item.incorrect {
+            background: #fee2e2;
+            border-color: #fca5a5;
+        }
+
+        .review-content {
+            display: flex;
+            gap: 12px;
+        }
+
+        .review-icon {
+            width: 24px;
+            height: 24px;
+            flex-shrink: 0;
+            margin-top: 4px;
+        }
+
+        .review-text {
+            flex: 1;
+        }
+
+        .review-question {
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 8px;
+        }
+
+        .review-answer {
+            font-size: 0.875rem;
+            margin-bottom: 4px;
+        }
+
+        .review-your-answer {
+            color: #b91c1c;
+        }
+
+        .review-correct-answer {
+            color: #065f46;
+        }
+
+        .review-explanation {
+            font-size: 0.875rem;
+            color: #4b5563;
+            font-style: italic;
+            margin-top: 8px;
+            padding-left: 16px;
+            border-left: 2px solid #d1d5db;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .center-btn {
+            display: flex;
+            justify-content: center;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 24px;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            .question {
+                font-size: 1.25rem;
+            }
+
+            .option {
+                font-size: 1rem;
+                padding: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container" id="app"></div>
+
+    <script>
+        const quizData = [
   {
     id: 1,
     question: "Dynamic scalability of Hadoop means:",
@@ -416,295 +810,287 @@ const quizData = [
   }
 ];
 
-export default function HadoopQuiz() {
-  const [gameState, setGameState] = useState('start'); // start, quiz, results
-  const [currentQuestion, setCurrentQuestion] = useState(0);
-  const [selectedAnswer, setSelectedAnswer] = useState(null);
-  const [score, setScore] = useState(0);
-  const [answered, setAnswered] = useState(false);
-  const [userAnswers, setUserAnswers] = useState([]);
+        let state = {
+            gameState: 'start',
+            currentQuestion: 0,
+            selectedAnswer: null,
+            score: 0,
+            answered: false,
+            userAnswers: []
+        };
 
-  const handleStartQuiz = () => {
-    setGameState('quiz');
-    setCurrentQuestion(0);
-    setScore(0);
-    setUserAnswers([]);
-    setSelectedAnswer(null);
-    setAnswered(false);
-  };
-
-  const handleAnswerClick = (option) => {
-    if (answered) return;
-    
-    setSelectedAnswer(option);
-    setAnswered(true);
-    
-    const isCorrect = option === quizData[currentQuestion].correct_answer;
-    if (isCorrect) {
-      setScore(score + 1);
-    }
-    
-    setUserAnswers([...userAnswers, {
-      question: quizData[currentQuestion].question,
-      selectedAnswer: option,
-      correctAnswer: quizData[currentQuestion].correct_answer,
-      isCorrect: isCorrect,
-      explanation: quizData[currentQuestion].explanation
-    }]);
-  };
-
-  const handleNext = () => {
-    if (currentQuestion < quizData.length - 1) {
-      setCurrentQuestion(currentQuestion + 1);
-      setSelectedAnswer(null);
-      setAnswered(false);
-    } else {
-      setGameState('results');
-    }
-  };
-
-  const handleRestart = () => {
-    setGameState('start');
-    setCurrentQuestion(0);
-    setSelectedAnswer(null);
-    setScore(0);
-    setAnswered(false);
-    setUserAnswers([]);
-  };
-
-  const getOptionClass = (option) => {
-    if (!answered) {
-      return 'bg-white hover:bg-gradient-to-r hover:from-blue-50 hover:to-purple-50 border-2 border-gray-200 hover:border-blue-400 hover:shadow-md';
-    }
-    
-    if (option === quizData[currentQuestion].correct_answer) {
-      return 'bg-gradient-to-r from-green-50 to-emerald-50 border-2 border-green-500 shadow-lg';
-    }
-    
-    if (option === selectedAnswer && option !== quizData[currentQuestion].correct_answer) {
-      return 'bg-gradient-to-r from-red-50 to-rose-50 border-2 border-red-500 shadow-lg';
-    }
-    
-    return 'bg-gray-50 border-2 border-gray-200 opacity-60';
-  };
-
-  const getIconForOption = (option) => {
-    if (!answered) return null;
-    
-    if (option === quizData[currentQuestion].correct_answer) {
-      return <CheckCircle className="w-6 h-6 text-green-600" />;
-    }
-    
-    if (option === selectedAnswer && option !== quizData[currentQuestion].correct_answer) {
-      return <XCircle className="w-6 h-6 text-red-600" />;
-    }
-    
-    return null;
-  };
-
-  // Start Screen
-  if (gameState === 'start') {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500 flex items-center justify-center p-4">
-        <div className="bg-white rounded-3xl shadow-2xl p-8 md:p-12 max-w-2xl w-full text-center">
-          <div className="inline-block p-6 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full mb-6 shadow-lg">
-            <BookOpen className="w-20 h-20 text-white" />
-          </div>
-          
-          <h1 className="text-5xl font-bold text-gray-800 mb-4">Hadoop & Python Quiz</h1>
-          <p className="text-xl text-gray-600 mb-8">Test your knowledge with {quizData.length} questions</p>
-          
-          <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-2xl p-6 mb-8 border-2 border-purple-200">
-            <h3 className="text-lg font-semibold text-gray-800 mb-3">Quiz Features:</h3>
-            <ul className="text-left text-gray-700 space-y-2">
-              <li className="flex items-center gap-2">
-                <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                {quizData.length} Multiple Choice Questions
-              </li>
-              <li className="flex items-center gap-2">
-                <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
-                Instant feedback on your answers
-              </li>
-              <li className="flex items-center gap-2">
-                <div className="w-2 h-2 bg-pink-500 rounded-full"></div>
-                Detailed explanations for each question
-              </li>
-              <li className="flex items-center gap-2">
-                <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                Track your score in real-time
-              </li>
-            </ul>
-          </div>
-          
-          <button
-            onClick={handleStartQuiz}
-            className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-12 py-5 rounded-xl font-semibold text-xl hover:shadow-xl transform hover:scale-105 transition-all duration-200 flex items-center gap-3 mx-auto"
-          >
-            <Play className="w-6 h-6" />
-            Start Quiz
-          </button>
-        </div>
-      </div>
-    );
-  }
-
-  // Results Screen
-  if (gameState === 'results') {
-    const percentage = ((score / quizData.length) * 100).toFixed(0);
-    
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500 p-4 py-8">
-        <div className="bg-white rounded-3xl shadow-2xl p-6 md:p-10 max-w-5xl mx-auto">
-          <div className="text-center mb-8">
-            <div className="inline-block p-6 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-full mb-6 shadow-lg">
-              <Award className="w-20 h-20 text-white" />
-            </div>
-            
-            <h2 className="text-4xl font-bold text-gray-800 mb-4">Quiz Complete!</h2>
-            
-            <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-2xl p-8 mb-6 border-2 border-purple-200">
-              <p className="text-6xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600 mb-2">
-                {score}/{quizData.length}
-              </p>
-              <p className="text-2xl text-gray-600">Score: {percentage}%</p>
-            </div>
-            
-            <div className="mb-6">
-              {percentage >= 80 ? (
-                <p className="text-xl text-green-600 font-semibold">Excellent work! You really know your Hadoop & Python! 🎉</p>
-              ) : percentage >= 60 ? (
-                <p className="text-xl text-blue-600 font-semibold">Good job! Keep learning! 👍</p>
-              ) : (
-                <p className="text-xl text-orange-600 font-semibold">Keep practicing! You'll get better! 💪</p>
-              )}
-            </div>
-          </div>
-
-          {/* Detailed Results */}
-          <div className="mb-8">
-            <h3 className="text-2xl font-bold text-gray-800 mb-4 flex items-center gap-2">
-              <BookOpen className="w-7 h-7" />
-              Answer Review
-            </h3>
-            
-            <div className="space-y-4 max-h-96 overflow-y-auto pr-2">
-              {userAnswers.map((answer, index) => (
-                <div 
-                  key={index}
-                  className={`p-5 rounded-xl border-2 ${
-                    answer.isCorrect 
-                      ? 'bg-green-50 border-green-300' 
-                      : 'bg-red-50 border-red-300'
-                  }`}
-                >
-                  <div className="flex items-start gap-3 mb-3">
-                    {answer.isCorrect ? (
-                      <CheckCircle className="w-6 h-6 text-green-600 flex-shrink-0 mt-1" />
-                    ) : (
-                      <XCircle className="w-6 h-6 text-red-600 flex-shrink-0 mt-1" />
-                    )}
-                    <div className="flex-1">
-                      <p className="font-semibold text-gray-800 mb-2">
-                        Q{index + 1}: {answer.question}
-                      </p>
-                      
-                      {!answer.isCorrect && (
-                        <div className="mb-2">
-                          <p className="text-sm text-red-700">
-                            <span className="font-semibold">Your answer:</span> {answer.selectedAnswer}
-                          </p>
-                        </div>
-                      )}
-                      
-                      <p className="text-sm text-green-700 mb-2">
-                        <span className="font-semibold">Correct answer:</span> {answer.correctAnswer}
-                      </p>
-                      
-                      {answer.explanation && (
-                        <p className="text-sm text-gray-600 italic mt-2 pl-4 border-l-2 border-gray-300">
-                          {answer.explanation}
-                        </p>
-                      )}
+        function renderStartScreen() {
+            return `
+                <div class="results-container">
+                    <div class="icon-container">
+                        <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                        </svg>
                     </div>
-                  </div>
+                    
+                    <h1>Hadoop & Python Quiz</h1>
+                    <p class="subtitle">Test your knowledge with ${quizData.length} questions</p>
+                    
+                    <div class="features-box">
+                        <h3>Quiz Features:</h3>
+                        <ul class="features-list">
+                            <li>
+                                <div class="bullet bullet-1"></div>
+                                ${quizData.length} Multiple Choice Questions
+                            </li>
+                            <li>
+                                <div class="bullet bullet-2"></div>
+                                Instant feedback on your answers
+                            </li>
+                            <li>
+                                <div class="bullet bullet-3"></div>
+                                Detailed explanations for each question
+                            </li>
+                            <li>
+                                <div class="bullet bullet-4"></div>
+                                Track your score in real-time
+                            </li>
+                        </ul>
+                    </div>
+                    
+                    <div class="center-btn">
+                        <button class="btn" onclick="startQuiz()">
+                            <svg width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M8 5v14l11-7z"></path>
+                            </svg>
+                            Start Quiz
+                        </button>
+                    </div>
                 </div>
-              ))}
-            </div>
-          </div>
+            `;
+        }
 
-          <div className="text-center">
-            <button
-              onClick={handleRestart}
-              className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-8 py-4 rounded-xl font-semibold text-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 flex items-center gap-2 mx-auto"
-            >
-              <RotateCcw className="w-5 h-5" />
-              Take Quiz Again
-            </button>
-          </div>
-        </div>
-      </div>
-    );
-  }
+        function renderQuizScreen() {
+            const question = quizData[state.currentQuestion];
+            const progress = ((state.currentQuestion + 1) / quizData.length) * 100;
 
-  // Quiz Screen
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500 flex items-center justify-center p-4">
-      <div className="bg-white rounded-3xl shadow-2xl p-6 md:p-10 max-w-4xl w-full">
-        {/* Header */}
-        <div className="mb-8">
-          <div className="flex justify-between items-center mb-6">
-            <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-2 rounded-full text-sm font-semibold shadow-lg">
-              Question {currentQuestion + 1}/{quizData.length}
-            </div>
-            <div className="bg-gradient-to-r from-green-500 to-emerald-500 text-white px-6 py-2 rounded-full text-sm font-semibold shadow-lg">
-              Score: {score}
-            </div>
-          </div>
-          
-          {/* Progress Bar */}
-          <div className="w-full bg-gray-200 rounded-full h-3 overflow-hidden shadow-inner">
-            <div 
-              className="bg-gradient-to-r from-blue-600 to-purple-600 h-full rounded-full transition-all duration-500 ease-out shadow-lg"
-              style={{ width: `${((currentQuestion + 1) / quizData.length) * 100}%` }}
-            />
-          </div>
-        </div>
+            return `
+                <div class="header">
+                    <div class="badge badge-question">
+                        Question ${state.currentQuestion + 1}/${quizData.length}
+                    </div>
+                    <div class="badge badge-score">
+                        Score: ${state.score}
+                    </div>
+                </div>
+                
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: ${progress}%"></div>
+                </div>
+                
+                <div style="margin-top: 32px;">
+                    <h2 class="question">${question.question}</h2>
+                    
+                    <div class="options">
+                        ${question.options.map((option, index) => {
+                            let optionClass = 'option';
+                            let icon = '';
+                            
+                            if (state.answered) {
+                                optionClass += ' disabled';
+                                if (option === question.correct_answer) {
+                                    optionClass = 'option correct';
+                                    icon = `<svg class="option-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                    </svg>`;
+                                } else if (option === state.selectedAnswer) {
+                                    optionClass = 'option incorrect';
+                                    icon = `<svg class="option-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                    </svg>`;
+                                }
+                            }
+                            
+                            return `
+                                <button class="${optionClass}" onclick="selectAnswer('${option.replace(/'/g, "\\'")}')">
+                                    <span>${option}</span>
+                                    ${icon}
+                                </button>
+                            `;
+                        }).join('')}
+                    </div>
+                </div>
+                
+                ${state.answered ? `
+                    <div class="next-btn-container">
+                        <button class="btn" onclick="nextQuestion()">
+                            ${state.currentQuestion < quizData.length - 1 ? 'Next Question' : 'View Results'}
+                            <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                            </svg>
+                        </button>
+                    </div>
+                ` : ''}
+            `;
+        }
 
-        {/* Question */}
-        <div className="mb-8">
-          <h2 className="text-2xl md:text-3xl font-bold text-gray-800 mb-8 leading-relaxed whitespace-pre-line">
-            {quizData[currentQuestion].question}
-          </h2>
+        function renderResultsScreen() {
+            const percentage = ((state.score / quizData.length) * 100).toFixed(0);
+            let feedbackClass = 'feedback ';
+            let feedbackText = '';
+            
+            if (percentage >= 80) {
+                feedbackClass += 'excellent';
+                feedbackText = 'Excellent work! You really know your Hadoop & Python! 🎉';
+            } else if (percentage >= 60) {
+                feedbackClass += 'good';
+                feedbackText = 'Good job! Keep learning! 👍';
+            } else {
+                feedbackClass += 'practice';
+                feedbackText = 'Keep practicing! You\'ll get better! 💪';
+            }
 
-          {/* Options */}
-          <div className="space-y-4">
-            {quizData[currentQuestion].options.map((option, index) => (
-              <button
-                key={index}
-                onClick={() => handleAnswerClick(option)}
-                disabled={answered}
-                className={`w-full text-left p-5 rounded-xl transition-all duration-300 transform hover:scale-[1.02] ${getOptionClass(option)} flex items-center justify-between gap-4`}
-              >
-                <span className="text-gray-800 text-lg font-medium flex-1">{option}</span>
-                {getIconForOption(option)}
-              </button>
-            ))}
-          </div>
-        </div>
+            return `
+                <div class="results-container">
+                    <div class="icon-container">
+                        <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"></path>
+                        </svg>
+                    </div>
+                    
+                    <h2 style="font-size: 2.5rem; font-weight: bold; color: #1f2937; margin-bottom: 24px;">Quiz Complete!</h2>
+                    
+                    <div class="score-display">
+                        <p class="score-number">${state.score}/${quizData.length}</p>
+                        <p class="score-percentage">Score: ${percentage}%</p>
+                    </div>
+                    
+                    <div class="${feedbackClass}">${feedbackText}</div>
+                </div>
 
-        {/* Next Button */}
-        {answered && (
-          <div className="flex justify-end animate-in">
-            <button
-              onClick={handleNext}
-              className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-8 py-4 rounded-xl font-semibold text-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 flex items-center gap-2"
-            >
-              {currentQuestion < quizData.length - 1 ? 'Next Question' : 'View Results'}
-              <ChevronRight className="w-5 h-5" />
-            </button>
-          </div>
-        )}
-      </div>
-    </div>
-  );
-}
+                <div class="review-section">
+                    <h3 class="review-title">
+                        <svg width="28" height="28" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                        </svg>
+                        Answer Review
+                    </h3>
+                    
+                    <div class="review-list">
+                        ${state.userAnswers.map((answer, index) => `
+                            <div class="review-item ${answer.isCorrect ? 'correct' : 'incorrect'}">
+                                <div class="review-content">
+                                    ${answer.isCorrect ? `
+                                        <svg class="review-icon" fill="none" stroke="green" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                        </svg>
+                                    ` : `
+                                        <svg class="review-icon" fill="none" stroke="red" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                        </svg>
+                                    `}
+                                    <div class="review-text">
+                                        <p class="review-question">Q${index + 1}: ${answer.question}</p>
+                                        
+                                        ${!answer.isCorrect ? `
+                                            <p class="review-answer review-your-answer">
+                                                <strong>Your answer:</strong> ${answer.selectedAnswer}
+                                            </p>
+                                        ` : ''}
+                                        
+                                        <p class="review-answer review-correct-answer">
+                                            <strong>Correct answer:</strong> ${answer.correctAnswer}
+                                        </p>
+                                        
+                                        ${answer.explanation ? `
+                                            <p class="review-explanation">${answer.explanation}</p>
+                                        ` : ''}
+                                    </div>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+
+                <div class="center-btn">
+                    <button class="btn" onclick="restartQuiz()">
+                        <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                        </svg>
+                        Take Quiz Again
+                    </button>
+                </div>
+            `;
+        }
+
+        function render() {
+            const app = document.getElementById('app');
+            
+            if (state.gameState === 'start') {
+                app.innerHTML = renderStartScreen();
+            } else if (state.gameState === 'quiz') {
+                app.innerHTML = renderQuizScreen();
+            } else if (state.gameState === 'results') {
+                app.innerHTML = renderResultsScreen();
+            }
+        }
+
+        function startQuiz() {
+            state = {
+                gameState: 'quiz',
+                currentQuestion: 0,
+                selectedAnswer: null,
+                score: 0,
+                answered: false,
+                userAnswers: []
+            };
+            render();
+        }
+
+        function selectAnswer(option) {
+            if (state.answered) return;
+            
+            state.selectedAnswer = option;
+            state.answered = true;
+            
+            const question = quizData[state.currentQuestion];
+            const isCorrect = option === question.correct_answer;
+            
+            if (isCorrect) {
+                state.score++;
+            }
+            
+            state.userAnswers.push({
+                question: question.question,
+                selectedAnswer: option,
+                correctAnswer: question.correct_answer,
+                isCorrect: isCorrect,
+                explanation: question.explanation
+            });
+            
+            render();
+        }
+
+        function nextQuestion() {
+            if (state.currentQuestion < quizData.length - 1) {
+                state.currentQuestion++;
+                state.selectedAnswer = null;
+                state.answered = false;
+            } else {
+                state.gameState = 'results';
+            }
+            render();
+        }
+
+        function restartQuiz() {
+            state = {
+                gameState: 'start',
+                currentQuestion: 0,
+                selectedAnswer: null,
+                score: 0,
+                answered: false,
+                userAnswers: []
+            };
+            render();
+        }
+
+        // Initial render
+        render();
+    </script>
+</body>
+</html>
